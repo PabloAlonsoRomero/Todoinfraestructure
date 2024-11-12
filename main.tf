@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     digitalocean = {
-      source = "digitalocean/digitalocean"
+      source  = "digitalocean/digitalocean"
       version = "~> 2.0"
     }
   }
@@ -10,13 +10,13 @@ terraform {
     endpoints = {
       s3 = "https://sfo3.digitaloceanspaces.com"
     }
-    bucket = "devpear"
-    key = "terraform.tfstate"
+    bucket                      = "devpear"
+    key                         = "terraform.tfstate"
     skip_credentials_validation = true
-    skip_requesting_account_id = true
-    skip_metadata_api_check = true
-    skip_s3_checksum = true
-    region = "us-east-1"
+    skip_requesting_account_id  = true
+    skip_metadata_api_check     = true
+    skip_s3_checksum            = true
+    region                      = "us-east-1"
   }
 }
 
@@ -25,50 +25,50 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_project" "pablo_server_project" {
-  name = "pablo_server_project"
+  name        = "pablo_server_project"
   description = "Un servidor para cositas personales"
-  resources = [ digitalocean_droplet.pablo_server_droplet.urn ]
+  resources   = [digitalocean_droplet.pablo_server_droplet.urn]
 }
 
 resource "digitalocean_ssh_key" "pablo-server-ssh-key" {
-  name = "pablo_server_key"
+  name       = "pablo_server_key"
   public_key = file("./keys/pablo_server.pub")
 }
 
 resource "digitalocean_droplet" "pablo_server_droplet" {
-  name = "pablo-server"
-  size = "s-2vcpu-4gb-120gb-intel"
-  image = "ubuntu-24-04-x64"
-  region = "sfo3"
-  ssh_keys = [ digitalocean_ssh_key.pablo-server-ssh-key.id ]
+  name      = "pablo-server"
+  size      = "s-2vcpu-4gb-120gb-intel"
+  image     = "ubuntu-24-04-x64"
+  region    = "sfo3"
+  ssh_keys  = [digitalocean_ssh_key.pablo-server-ssh-key.id]
   user_data = file("./docker-install.sh")
 
   provisioner "remote-exec" {
-    inline = [ 
+    inline = [
       "mkdir -p /projects",
       "touch /projects/.env",
       "echo \"MYSQL_DB=${var.MYSQL_DB}\" >> /projects/.env",
       "echo \"MYSQL_USER=${var.MYSQL_USER}\" >> /projects/.env",
       "echo \"MYSQL_HOST=${var.MYSQL_HOST}\" >> /projects/.env",
       "echo \"MYSQL_PASSWORD=${var.MYSQL_PASSWORD}\" >> /projects/.env"
-     ]
-     connection {
-       type = "ssh"
-       user = "root"
-       private_key = file("./keys/pablo_server")
-       host = self.ipv4_address
-     }
+    ]
+    connection {
+      type        = "ssh"
+      user        = "root"
+      private_key = file("./keys/pablo_server")
+      host        = self.ipv4_address
+    }
   }
 
   provisioner "file" {
-    source = "./containers/docker-compose.yml"
+    source      = "./containers/docker-compose.yml"
     destination = "/projects/docker-compose.yml"
     connection {
-       type = "ssh"
-       user = "root"
-       private_key = file("./keys/pablo_server")
-       host = self.ipv4_address
-     }
+      type        = "ssh"
+      user        = "root"
+      private_key = file("./keys/pablo_server")
+      host        = self.ipv4_address
+    }
   }
 }
 
