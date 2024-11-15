@@ -26,7 +26,7 @@ services:
       - /volumes/nginx/certs:/etc/nginx/certs
       - /volumes/nginx/vhostd:/etc/nginx/vhost.d
       - /volumes/nginx/html:/usr/share/nginx/html:rw
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   mysql:
     image: mysql
@@ -44,11 +44,11 @@ services:
       timeout: 5s
       retries: 5
   
-  todo-app:
-    image: pabloalonso24/pablo-server-page:latest
-    container_name: TodoApp
-    expose:
-      - "80"
+  # todo-app:
+  #   image: pabloalonso24/pablo-server-page:latest
+  #   container_name: TodoApp
+  #   expose:
+  #     - "80"
 
   todo-api:
     image: saraymartinez002/examen_2parcial:latest
