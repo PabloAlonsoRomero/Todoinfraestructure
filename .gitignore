@@ -3,6 +3,7 @@
 
 ### Terraform ###
 # Local .terraform directories
+.env
 **/.terraform/*
 **/keys/**
 
